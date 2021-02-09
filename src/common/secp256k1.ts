@@ -35,7 +35,7 @@ const bintools: BinTools = BinTools.getInstance();
 
 
 /**
- * Class for representing a private and public keypair on the Platform Chain. 
+ * Class for representing a private and public keypair on the Platform Chain.
  */
 export abstract class SECP256k1KeyPair extends StandardKeyPair {
     protected keypair:elliptic.ec.KeyPair
@@ -60,7 +60,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
      */
     generateKey = () => {
         this.keypair = ec.genKeyPair();
-    
+
         // doing hex translation to get Buffer class
         this.privk = Buffer.from(this.keypair.getPrivate('hex').padStart(64, '0'), 'hex');
         this.pubk = Buffer.from(this.keypair.getPublic(true, 'hex').padStart(66, '0'), 'hex');
@@ -83,7 +83,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
 
     /**
      * Returns the address as a {@link https://github.com/feross/buffer|Buffer}.
-     * 
+     *
      * @returns A {@link https://github.com/feross/buffer|Buffer} representation of the address
      */
     getAddress = ():Buffer => {
@@ -92,7 +92,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
 
     /**
      * Returns the address's string representation.
-     * 
+     *
      * @returns A string representation of the address
      */
     getAddressString:() => string;
@@ -111,7 +111,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
         }
         if (pubk.length === 33) {
           const sha256:Buffer = Buffer.from(createHash('sha256').update(pubk).digest());
-          const ripesha:Buffer = Buffer.from(createHash('rmd160').update(sha256).digest());
+          const ripesha:Buffer = Buffer.from(createHash('ripemd160').update(sha256).digest());
           return ripesha;
         }
         /* istanbul ignore next */
@@ -120,7 +120,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
 
     /**
      * Returns a string representation of the private key.
-     * 
+     *
      * @returns A cb58 serialized string representation of the public key
      */
     getPrivateKeyString = ():string => {
@@ -129,7 +129,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
 
     /**
      * Returns the public key.
-     * 
+     *
      * @returns A cb58 serialized string representation of the public key
      */
     getPublicKeyString = ():string => {
@@ -139,9 +139,9 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
 
     /**
      * Takes a message, signs it, and returns the signature.
-     * 
+     *
      * @param msg The message to sign, be sure to hash first if expected
-     * 
+     *
      * @returns A {@link https://github.com/feross/buffer|Buffer} containing the signature
      */
     sign = (msg:Buffer):Buffer => {
@@ -153,26 +153,26 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
         const result:Buffer = Buffer.concat([r,s, recovery], 65);
         return result;
     }
-    
+
     /**
      * Verifies that the private key associated with the provided public key produces the signature associated with the given message.
-     * 
+     *
      * @param msg The message associated with the signature
      * @param sig The signature of the signed message
-     * 
+     *
      * @returns True on success, false on failure
      */
-    verify = (msg:Buffer, sig:Buffer):boolean => { 
+    verify = (msg:Buffer, sig:Buffer):boolean => {
         const sigObj:elliptic.ec.SignatureOptions = this._sigFromSigBuffer(sig);
         return ec.verify(msg, sigObj, this.keypair);
     }
 
     /**
      * Recovers the public key of a message signer from a message and its associated signature.
-     * 
+     *
      * @param msg The message that's signed
      * @param sig The signature that's signed on the message
-     * 
+     *
      * @returns A {@link https://github.com/feross/buffer|Buffer} containing the public key of the signer
      */
     recover = (msg:Buffer, sig:Buffer):Buffer => {
@@ -182,27 +182,27 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
     }
 
     /**
-     * Class for representing a private and public keypair in Avalanche PlatformVM. 
+     * Class for representing a private and public keypair in Avalanche PlatformVM.
      */
     constructor() {
         super();
     }
-    
+
 }
 
 /**
- * Class for representing a key chain in Avalanche. 
- * 
+ * Class for representing a key chain in Avalanche.
+ *
  * @typeparam SECP256k1KeyPair Class extending [[StandardKeyPair]] which is used as the key in [[SECP256k1KeyChain]]
  */
 export abstract class SECP256k1KeyChain<SECPKPClass extends SECP256k1KeyPair> extends StandardKeyChain<SECPKPClass> {
 
     /**
      * Makes a new key pair, returns the address.
-     * 
+     *
      * @returns Address of the new key pair
      */
-    makeKey:() => SECPKPClass; 
+    makeKey:() => SECPKPClass;
 
     addKey(newKey:SECPKPClass) {
         super.addKey(newKey);
@@ -210,9 +210,9 @@ export abstract class SECP256k1KeyChain<SECPKPClass extends SECP256k1KeyPair> ex
 
     /**
      * Given a private key, makes a new key pair, returns the address.
-     * 
-     * @param privk A {@link https://github.com/feross/buffer|Buffer} or cb58 serialized string representing the private key 
-     * 
+     *
+     * @param privk A {@link https://github.com/feross/buffer|Buffer} or cb58 serialized string representing the private key
+     *
      * @returns Address of the new key pair
      */
     importKey:(privk:Buffer | string) => SECPKPClass;
